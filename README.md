@@ -2,6 +2,33 @@
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.24.
 
+## Dynamic AI provider demo
+
+`AppStore` owns the prompt, messages, pending state, and recoverable request errors.
+`Ai.chat()` selects a loader, awaits the DI service, and forwards the prompt.
+`AI_PROVIDER_LOADER` uses a computed signal to select between `injectAsync` loaders.
+Changing the provider does not load it until the next request.
+
+Register `provideAi()` alongside the chat store in the component's `providers`.
+This scopes the selection, loader, and facade together. Separate chat instances
+have independent selections; stateless concrete services remain auto-provided.
+A request keeps the provider selected when it started, even if the user changes
+the dropdown while awaiting a response.
+
+The providers currently return mock responses. Provider identifiers are not model
+identifiers; selecting multiple models per provider can be added to the request
+contract when real integrations are introduced.
+
+To add a provider, extend `AiProviderId` and `AI_PROVIDER_OPTIONS`, implement
+`AiProvider` in an auto-provided service, and add its dynamic import to the typed
+loader registry. Avoid static imports of concrete providers in application code.
+
+Tests cover provider switching, independent scopes, deferred loading, failures,
+duplicate submission prevention, draft preservation, and request retry. A failed
+dynamic import is cached by the current Angular `injectAsync` implementation;
+a page reload may be needed to recover a failed chunk download. Provider request
+failures can be retried without reloading.
+
 ## Development server
 
 To start a local development server, run:

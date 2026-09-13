@@ -210,20 +210,33 @@
           </clipPath>
         </defs>
       </svg>
-      <h1>Hello, {{ store.title() }}</h1>
+      <h1>Hello, {{ store.title }}</h1>
       <p>Congratulations! Your app is running. 🎉</p>
 
-      <select [formField]="store.aiModel">
-        <option value="openai">OpenAI</option>
-        <option value="gemini">Gemini</option>
+      <label for="ai-provider">Provider</label>
+      <select id="ai-provider" [formField]="store.providerField">
+        @for (provider of store.providerOptions; track provider.id) {
+          <option [value]="provider.id">{{ provider.label }}</option>
+        }
       </select>
 
-      <textarea type="text" [formField]="store.aiPrompt"></textarea>
-      <button (click)="store.chat(store.aiPrompt().value())">Send</button>
+      <label for="ai-prompt">Prompt</label>
+      <textarea id="ai-prompt" [formField]="store.promptField"></textarea>
+      <button type="button" [disabled]="!store.canSend()" (click)="store.send()">
+        {{ store.pending() ? 'Sending…' : 'Send' }}
+      </button>
 
-      <ul>
-        @for (message of store.messages(); track $index) {
-        <li>{{ message }}</li>
+      @if (store.error(); as error) {
+        <p role="alert">{{ error }}</p>
+      }
+
+      <ul aria-live="polite" [attr.aria-busy]="store.pending()">
+        @for (message of store.messages(); track message.id) {
+          <li>
+            <strong>{{ message.provider }}</strong>
+            <p>{{ message.prompt }}</p>
+            <p>{{ message.response }}</p>
+          </li>
         }
       </ul>
     </div>
