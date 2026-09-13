@@ -1,25 +1,56 @@
-import { computed, inject, InjectionToken, signal, Signal, WritableSignal } from '@angular/core';
-import { OpenAiProvider } from './open-ai-provider';
+import {
+  computed,
+  inject,
+  injectAsync,
+  InjectionToken,
+  Service,
+  signal,
+  type Signal,
+  type WritableSignal,
+} from '@angular/core';
 
-export interface AiProvder {
+export interface AiProvider {
   chat(prompt: string): Promise<string>;
 }
 
-const AI_MODEL = new InjectionToken<Signal<string> | WritableSignal<string>>('AI_MODEL', {
-  factory: () => signal<'openai' | 'gemini'>('openai'),
+export type AiModel = 'openai' | 'gemini';
+export type AiProviderLoader = () => Promise<AiProvider>;
+
+export const AI_MODEL = new InjectionToken<WritableSignal<AiModel>>('AI_MODEL', {
+  factory: () => signal<AiModel>('openai'),
 });
 
-const AI_PROVIDER = new InjectionToken<unknown>('AI_PROVIDER', {
+export const AI_PROVIDER = new InjectionToken<Signal<AiProviderLoader>>('AI_PROVIDER', {
   factory: () => {
     const model = inject(AI_MODEL);
+
+    const openai = injectAsync<AiProvider>(() =>
+      import('./open-ai-provider').then((m) => m.OpenAiProvider),
+    );
+
+    const gemini = injectAsync<AiProvider>(() =>
+      import('./gemini-provider').then((m) => m.GeminiProvider),
+    );
 
     return computed(() => {
       switch (model()) {
         case 'openai':
-          return;
-        default:
-          return OpenAiProvider;
+          return openai;
+        case 'gemini':
+          return gemini;
       }
     });
   },
 });
+
+@Service()
+export class Ai implements AiProvider {
+  readonly #provider = inject(AI_PROVIDER);
+
+  async chat(prompt: string): Promise<string> {
+    const loadProvider = this.#provider();
+    const provider = await loadProvider();
+
+    return provider.chat(prompt);
+  }
+}

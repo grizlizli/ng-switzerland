@@ -2,8 +2,8 @@ import { Injectable, Service } from '@angular/core';
 import { AiProvider } from './ai';
 
 @Service()
-export class OpenAiProvider implements AiProvider {
+export class GeminiProvider implements AiProvider {
   async chat(prompt: string): Promise<string> {
-    return await `openai: ${prompt}`;
+    return await `gemini: ${prompt}`;
   }
 }
