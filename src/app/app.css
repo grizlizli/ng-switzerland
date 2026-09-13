@@ -326,8 +326,13 @@ footer {
   .hero {
     padding-top: 32px;
   }
+  .intro {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
   .intro .byline {
-    display: none;
+    text-align: left;
   }
   .ribbon {
     margin-top: 12px;
