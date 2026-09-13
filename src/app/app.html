@@ -210,19 +210,19 @@
           </clipPath>
         </defs>
       </svg>
-      <h1>Hello, {{ title() }}</h1>
+      <h1>Hello, {{ store.title() }}</h1>
       <p>Congratulations! Your app is running. 🎉</p>
 
-      <select [formField]="aiModel">
+      <select [formField]="store.aiModel">
         <option value="openai">OpenAI</option>
         <option value="gemini">Gemini</option>
       </select>
 
-      <textarea type="text" [formField]="aiPrompt"></textarea>
-      <button (click)="chat(aiPrompt().value())">Send</button>
+      <textarea type="text" [formField]="store.aiPrompt"></textarea>
+      <button (click)="store.chat(store.aiPrompt().value())">Send</button>
 
       <ul>
-        @for (message of messages(); track $index) {
+        @for (message of store.messages(); track $index) {
         <li>{{ message }}</li>
         }
       </ul>
