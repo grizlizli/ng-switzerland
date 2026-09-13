@@ -18,8 +18,6 @@ describe('App', () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain(
-      'Hello, NG Switzerland by Grizli Zli',
-    );
+    expect(compiled.querySelector('h1')?.textContent).toContain('AI. ON YOURTERMS.');
   });
 });

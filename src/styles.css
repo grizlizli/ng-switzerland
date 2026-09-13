@@ -1,1 +1,24 @@
-/* You can add global styles to this file, and also import other style files */
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  padding: 0 40px;
+  background: #fff;
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+button,
+select,
+textarea {
+  font: inherit;
+}
+::selection {
+  background: #efcdff;
+  color: #0b0b0b;
+}
+@media (max-width: 760px) {
+  body {
+    padding: 0 20px;
+  }
+}
