@@ -1,0 +1,28 @@
+@if (visible() || error()) {
+  <aside class="install-card" aria-labelledby="install-title">
+    <div class="copy">
+      <p class="eyebrow">YOUR PLAYGROUND. ONE TAP AWAY.</p>
+      <h2 id="install-title">Make it an app.</h2>
+      <p>Keep AI Playground on your home screen or desktop.</p>
+      @if (ios() && !canInstall()) {
+        <p class="instructions">
+          Open the browser’s <strong>Share</strong> menu, choose
+          <strong>Add to Home Screen</strong>, then tap <strong>Add</strong>.
+        </p>
+      }
+      @if (error()) {
+        <p role="status">{{ error() }}</p>
+      }
+    </div>
+    <div class="actions">
+      @if (canInstall()) {
+        <button class="install" type="button" [disabled]="pending()" (click)="install()">
+          {{ pending() ? 'INSTALLING…' : 'INSTALL APP ↗' }}
+        </button>
+      }
+      <button class="later" type="button" [disabled]="pending()" (click)="error.set(''); dismiss()">
+        NOT NOW
+      </button>
+    </div>
+  </aside>
+}

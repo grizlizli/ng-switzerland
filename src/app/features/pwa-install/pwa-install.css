@@ -1,0 +1,76 @@
+:host {
+  display: block;
+}
+.install-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin: 0 0 32px;
+  padding: 24px;
+  border: 1px solid var(--ink);
+  border-top: 4px solid #b400ed;
+  background: #fafafa;
+}
+.eyebrow {
+  font: 700 10px monospace;
+  letter-spacing: 1.4px;
+  color: #7600ac;
+}
+h2 {
+  margin: 8px 0;
+  font-size: 28px;
+  letter-spacing: -1px;
+}
+p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.instructions {
+  margin-top: 12px;
+  max-width: 540px;
+}
+.actions {
+  display: flex;
+  gap: 12px;
+  flex-shrink: 0;
+}
+button {
+  min-height: 44px;
+  padding: 12px 18px;
+  border: 1px solid var(--ink);
+  cursor: pointer;
+  font: 700 11px monospace;
+  letter-spacing: 1px;
+}
+.install {
+  color: white;
+  background: var(--ink);
+}
+.later {
+  color: var(--ink);
+  background: transparent;
+}
+button:focus-visible {
+  outline: 3px solid #9600dc;
+  outline-offset: 4px;
+}
+button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+@media (max-width: 760px) {
+  .install-card {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 20px;
+    gap: 20px;
+  }
+  .actions {
+    flex-wrap: wrap;
+  }
+  .actions button {
+    flex: 1;
+  }
+}

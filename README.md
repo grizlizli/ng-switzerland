@@ -61,3 +61,5 @@ npm run build
 Tests exercise provider selection, independent chat scopes, form submission, HTTP errors and the local runtime lifecycle using test doubles. They do not download weights or prove GPU inference on every browser. Local runtime tests cover lazy initialization, reuse, retry, concurrency and unsupported browsers.
 
 References: [WebLLM](https://webllm.mlc.ai/docs/), [Angular style guide](https://angular.dev/style-guide).
+
+The install card appears when the browser fires `beforeinstallprompt`; installation requires an explicit click. iOS/iPadOS gets Share → Add to Home Screen instructions. Dismissal lasts for the browser session, and standalone mode hides the card. Test native installation in a supported browser using the production PWA preview or HTTPS deployment.
