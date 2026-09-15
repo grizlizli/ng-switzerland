@@ -63,3 +63,5 @@ Tests exercise provider selection, independent chat scopes, form submission, HTT
 References: [WebLLM](https://webllm.mlc.ai/docs/), [Angular style guide](https://angular.dev/style-guide).
 
 The install card appears when the browser fires `beforeinstallprompt`; installation requires an explicit click. iOS/iPadOS gets Share → Add to Home Screen instructions. Dismissal lasts for the browser session, and standalone mode hides the card. Test native installation in a supported browser using the production PWA preview or HTTPS deployment.
+
+`PwaInstall` renders the installation card and delegates actions to `PwaPrompt`. `providePwaPromt()` registers the service in the component scope. The service owns read-only UI signals, browser events, session dismissal and installation; its listeners are removed when that scope is destroyed.
