@@ -1,18 +1,11 @@
-import { Component, inject } from '@angular/core';
-import { form, FormField, maxLength } from '@angular/forms/signals';
-import { AppStore } from './app-store';
-import { provideAi } from './features/ai/provide-ai';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { AiChat } from './features/ai-chat/ai-chat';
 
 @Component({
   selector: 'app-root',
-  imports: [FormField],
+  imports: [AiChat],
   templateUrl: './app.html',
   styleUrl: './app.css',
-  providers: [provideAi(), AppStore],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class App {
-  protected readonly store = inject(AppStore);
-  protected readonly providerField = form(this.store.provider);
-  protected readonly modelField = form(this.store.model);
-  protected readonly promptField = form(this.store.prompt, (path) => maxLength(path, 8000));
-}
+export class App {}

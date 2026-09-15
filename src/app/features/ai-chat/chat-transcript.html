@@ -1,0 +1,34 @@
+<section class="conversation" aria-labelledby="conversation-title">
+  <div class="section-heading">
+    <span class="eyebrow" id="conversation-title">02 / THE CONVERSATION</span
+    ><span class="count">{{ messages().length }} EXCHANGES</span>
+  </div>
+  <div class="transcript" aria-live="polite" [attr.aria-busy]="pending()">
+    @for (message of messages(); track message.id) {
+      <article class="exchange">
+        <div class="message-label">
+          YOU <span>#{{ message.id + 1 }}</span>
+        </div>
+        <p class="prompt-text">{{ message.prompt }}</p>
+        <div class="response">
+          <div class="message-label">
+            <span class="provider-dot" aria-hidden="true"></span
+            >{{ message.provider === 'openai' ? 'OPENAI' : 'GEMINI'
+            }}<span>{{ message.model ?? 'MOCK' }}</span>
+          </div>
+          <p>{{ message.response }}</p>
+        </div>
+      </article>
+    } @empty {
+      <div class="empty">
+        <span class="swiss large" aria-hidden="true"></span>
+        <h2>Big ideas.<br /><span>Start here.</span></h2>
+        <p>Your first prompt starts the conversation.<br />Try OpenAI, then switch to Gemini.</p>
+        <span class="empty-arrow" aria-hidden="true">↖</span>
+      </div>
+    }
+    @if (pending()) {
+      <p class="loading" role="status">Waiting for a response…</p>
+    }
+  </div>
+</section>

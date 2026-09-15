@@ -1,20 +1,20 @@
 import { TestBed } from '@angular/core/testing';
 import { describe, beforeEach, it, expect, vi } from 'vitest';
-import { AppStore } from './app-store';
-import { Ai } from './features/ai/ai';
-import { provideAi } from './features/ai/provide-ai';
+import { AiChatStore } from './ai-chat-store';
+import { Ai } from '../ai/ai';
+import { provideAiChat } from './provide-ai-chat';
 
-describe('AppStore', () => {
+describe('AiChatStore', () => {
   const chat = vi.fn<(prompt: string) => Promise<string>>();
   beforeEach(() => {
     chat.mockReset();
     TestBed.configureTestingModule({
-      providers: [provideAi(), AppStore, { provide: Ai, useValue: { chat } }],
+      providers: [provideAiChat(), { provide: Ai, useValue: { chat } }],
     });
   });
 
   it('rejects empty prompts and duplicate submissions while preserving a new draft', async () => {
-    const store = TestBed.inject(AppStore);
+    const store = TestBed.inject(AiChatStore);
     store.prompt.set('  ');
     await store.send();
     expect(chat).not.toHaveBeenCalled();
@@ -42,7 +42,7 @@ describe('AppStore', () => {
   });
 
   it('retains failed prompts and allows a successful retry', async () => {
-    const store = TestBed.inject(AppStore);
+    const store = TestBed.inject(AiChatStore);
     store.prompt.set('hello');
     chat.mockRejectedValueOnce(new Error('offline')).mockResolvedValueOnce('answer');
     await store.send();

@@ -1,0 +1,122 @@
+:host {
+  display: block;
+  min-width: 0;
+  border-right: 1px solid var(--ink);
+}
+.eyebrow,
+label,
+.composer-note,
+.demo-badge,
+.disclaimer {
+  font-family: monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+.eyebrow {
+  margin: 0;
+  letter-spacing: 1.7px;
+}
+.composer {
+  padding: 28px;
+}
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.demo-badge {
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  background: #f4eaff;
+  padding: 5px;
+  color: #7814ac;
+}
+h2 {
+  font-size: 32px;
+  letter-spacing: -1.3px;
+  margin: 24px 0 10px;
+}
+.muted {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0 0 28px;
+}
+label {
+  display: block;
+  font-weight: bold;
+  margin: 22px 0 10px;
+}
+select,
+textarea {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  border: 1px solid #888;
+  background: white;
+  border-radius: 0;
+  color: var(--ink);
+  font: inherit;
+}
+select {
+  height: 48px;
+  padding: 0 14px;
+}
+textarea {
+  height: 140px;
+  resize: vertical;
+  min-height: 100px;
+  padding: 15px;
+  line-height: 1.5;
+}
+.composer-note {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  letter-spacing: 0;
+  color: var(--muted);
+  margin-top: 10px;
+}
+.send {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 24px;
+  background: var(--ink);
+  color: white;
+  border: 0;
+  padding: 17px 19px;
+  font: 700 12px monospace;
+  letter-spacing: 1px;
+  cursor: pointer;
+}
+.send:hover:enabled {
+  background: var(--gradient);
+}
+.send:disabled {
+  background: #e6e6e6;
+  color: #777;
+  cursor: not-allowed;
+}
+.disclaimer {
+  font-size: 10px;
+  letter-spacing: 0;
+  line-height: 1.5;
+  color: var(--muted);
+  margin: 16px 0 0;
+}
+.error {
+  color: #b00026;
+  font-size: 14px;
+}
+:is(a, button, select, textarea):focus-visible {
+  outline: 3px solid #9600dc;
+  outline-offset: 4px;
+}
+@media (max-width: 760px) {
+  :host {
+    border-right: 0;
+    border-bottom: 1px solid var(--ink);
+  }
+}

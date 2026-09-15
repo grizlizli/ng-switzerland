@@ -1,18 +1,12 @@
 import { computed, DestroyRef, inject, Injectable, signal } from '@angular/core';
-import { Ai } from './features/ai/ai';
-import { AI_PROVIDER_OPTIONS, OPENAI_MODELS, type AiProviderId } from './features/ai/ai-provider';
-import { AI_PROVIDER_SELECTION } from './features/ai/ai-provider-selection';
+import { Ai } from '../ai/ai';
+import { AI_PROVIDER_OPTIONS, OPENAI_MODELS } from '../ai/ai-provider';
+import { AI_PROVIDER_SELECTION } from '../ai/ai-provider-selection';
 
-export interface ChatMessage {
-  readonly id: number;
-  readonly provider: AiProviderId;
-  readonly prompt: string;
-  readonly model?: string;
-  readonly response: string;
-}
+import { MAX_PROMPT_LENGTH, type ChatMessage } from './chat-message';
 
 @Injectable()
-export class AppStore {
+export class AiChatStore {
   readonly #ai = inject(Ai);
   readonly provider = inject(AI_PROVIDER_SELECTION);
   readonly #destroyRef = inject(DestroyRef);
@@ -23,7 +17,6 @@ export class AppStore {
   readonly #error = signal<string | null>(null);
   #nextMessageId = 0;
 
-  readonly title = 'NG Switzerland by Grizli Zli';
   readonly providerOptions = AI_PROVIDER_OPTIONS;
   readonly models = OPENAI_MODELS;
   readonly isOpenAi = computed(() => this.provider() === 'openai');
@@ -31,7 +24,10 @@ export class AppStore {
   readonly pending = this.#pending.asReadonly();
   readonly error = this.#error.asReadonly();
   readonly canSend = computed(
-    () => !this.#pending() && this.prompt().trim().length > 0 && this.prompt().length <= 8000,
+    () =>
+      !this.#pending() &&
+      this.prompt().trim().length > 0 &&
+      this.prompt().length <= MAX_PROMPT_LENGTH,
   );
 
   async send(): Promise<void> {

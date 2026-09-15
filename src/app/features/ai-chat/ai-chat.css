@@ -1,0 +1,14 @@
+:host {
+  display: block;
+}
+.playground {
+  display: grid;
+  grid-template-columns: 390px minmax(0, 1fr);
+  border: 1px solid var(--ink);
+  margin-bottom: 36px;
+}
+@media (max-width: 760px) {
+  .playground {
+    grid-template-columns: 1fr;
+  }
+}

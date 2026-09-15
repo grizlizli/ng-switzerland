@@ -4,15 +4,23 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 ## Dynamic AI provider demo
 
-`AppStore` owns writable prompt/model/provider data, messages, pending state, and
-recoverable request errors. `App` creates Signal Forms and field validation from
+The page shell lives in `App`. `features/ai-chat` contains the chat container,
+composer, transcript, message type, and store with their colocated tests and
+styles. `features/ai` contains provider selection and lazy DI loading.
+`ChatTranscript` receives readonly messages and pending state through signal
+inputs; `ChatComposer` owns Signal Forms and uses the feature-scoped store.
+
+
+`AiChatStore` owns writable prompt/model/provider data, messages, pending state, and
+recoverable request errors. `ChatComposer` creates Signal Forms and field validation from
 those signals; the store has no dependency on Angular Forms. The store retains
 submission guards so calls from outside the UI also reject invalid prompts.
 `Ai.chat()` selects a loader, awaits the DI service, and forwards the prompt.
 `AI_PROVIDER_LOADER` uses a computed signal to select between `injectAsync` loaders.
 Changing the provider does not load it until the next request.
 
-Register `provideAi()` alongside the chat store in the component's `providers`.
+`AiChat` uses `provideAiChat()` to register `provideAi()` and `AiChatStore` together
+in its component providers.
 This scopes the selection, loader, and facade together. Separate chat instances
 have independent selections; stateless concrete services remain auto-provided.
 A request keeps the provider selected when it started, even if the user changes

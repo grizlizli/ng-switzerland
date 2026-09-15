@@ -1,0 +1,41 @@
+<form class="composer" (submit)="send($event)">
+  <div class="section-heading">
+    <span class="eyebrow">01 / YOUR INPUT</span><span class="demo-badge">MOCK DEMO</span>
+  </div>
+  <h2>Make the call.</h2>
+  <p class="muted">Pick a provider and give it something to think about.</p>
+  <label for="ai-provider">PROVIDER</label>
+  <select id="ai-provider" [formField]="providerField">
+    @for (provider of store.providerOptions; track provider.id) {
+      <option [value]="provider.id">{{ provider.label }}</option>
+    }
+  </select>
+  @if (store.isOpenAi()) {
+    <label for="ai-model">MODEL</label>
+    <select id="ai-model" [formField]="modelField">
+      @for (model of store.models; track model.id) {
+        <option [value]="model.id">{{ model.label }}</option>
+      }
+    </select>
+  }
+  <label for="ai-prompt">YOUR PROMPT</label>
+  <textarea
+    id="ai-prompt"
+    [formField]="promptField"
+    placeholder="What’s on your mind?"
+    (keydown.control.enter)="send($event)"
+    (keydown.meta.enter)="send($event)"
+  ></textarea>
+  <div class="composer-note">
+    <span>⌘ / CTRL + ENTER TO SEND</span
+    ><span>{{ promptField().value().length }} / {{ maxPromptLength }} CHARS</span>
+  </div>
+  <button type="submit" class="send" [disabled]="promptField().invalid() || store.pending()">
+    <span>{{ store.pending() ? 'SENDING…' : 'SEND PROMPT' }}</span
+    ><span aria-hidden="true">↗</span>
+  </button>
+  @if (store.error(); as error) {
+    <p class="error" role="alert">{{ error }}</p>
+  }
+  <p class="disclaimer">Local demo responses only. No external AI requests.</p>
+</form>

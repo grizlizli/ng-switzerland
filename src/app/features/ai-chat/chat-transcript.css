@@ -1,0 +1,129 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+.swiss {
+  display: inline-block;
+  position: relative;
+  background: var(--gradient);
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+.swiss:before,
+.swiss:after {
+  content: '';
+  position: absolute;
+  background: white;
+  inset: 24% 41%;
+}
+.swiss:after {
+  inset: 41% 24%;
+}
+.eyebrow,
+.count,
+.message-label {
+  font-family: monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+.eyebrow {
+  margin: 0;
+  letter-spacing: 1.7px;
+}
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+h2 {
+  font-size: 32px;
+  letter-spacing: -1.3px;
+  margin: 24px 0 10px;
+}
+.conversation {
+  min-width: 0;
+  padding: 28px;
+}
+.count {
+  color: var(--muted);
+  font-size: 10px;
+}
+.transcript {
+  max-height: 570px;
+  overflow: auto;
+}
+.empty {
+  position: relative;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.large {
+  width: 54px;
+  height: 54px;
+}
+.empty h2 {
+  font-size: 48px;
+  line-height: 1;
+  letter-spacing: -2px;
+}
+.empty h2 span {
+  color: #b3b3b3;
+}
+.empty p {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+.empty-arrow {
+  font-size: 48px;
+  color: #ccc;
+}
+.exchange {
+  padding: 26px 0;
+  border-bottom: 1px solid var(--line);
+}
+.message-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: bold;
+}
+.message-label span:last-child {
+  margin-left: auto;
+  color: var(--muted);
+  font-weight: normal;
+}
+.exchange p {
+  line-height: 1.65;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 15px;
+}
+.response {
+  background: #f6f6f6;
+  padding: 20px;
+  margin-top: 20px;
+  border-left: 2px solid #bb0ceb;
+}
+.response p {
+  margin-bottom: 0;
+}
+.provider-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--gradient);
+}
+.loading {
+  font: 12px monospace;
+}
+@media (max-width: 760px) {
+  .empty {
+    min-height: 330px;
+  }
+}
