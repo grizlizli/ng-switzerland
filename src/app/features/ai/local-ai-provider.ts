@@ -22,7 +22,8 @@ export const LOCAL_RUNTIME = new InjectionToken<(progress: Progress) => LocalRun
       }
       const worker = new Worker(new URL('./local-ai.worker', import.meta.url), { type: 'module' });
       const failed = new Promise<never>((_, reject) => {
-        worker.onerror = () => reject(new Error('Local AI worker failed. Please retry.'));
+        worker.onerror = (event) =>
+          reject(new Error(event.message || 'Local AI worker failed. Please retry.'));
       });
       const engine = import('@mlc-ai/web-llm').then(({ CreateWebWorkerMLCEngine }) =>
         CreateWebWorkerMLCEngine(
@@ -71,9 +72,22 @@ export class LocalAiProvider implements AiProvider {
       return result;
     } catch (error) {
       this.#reset();
-      throw error instanceof Error
-        ? error
-        : new Error('Local AI failed to load or generate. Please retry.');
+      if (error instanceof Error) throw error;
+      // WebLLM serializes worker errors to strings before rejecting the request.
+      const detail =
+        typeof error === 'string'
+          ? error
+          : error &&
+              typeof error === 'object' &&
+              'message' in error &&
+              typeof error.message === 'string'
+            ? error.message
+            : '';
+      throw new Error(
+        detail.trim()
+          ? `Local AI: ${detail}`
+          : 'Local AI failed to load or generate. Please retry.',
+      );
     } finally {
       clearTimeout(timer);
       this.#busy = false;

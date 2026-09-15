@@ -40,6 +40,32 @@ describe('LocalAiProvider', () => {
     expect(await provider.chat('two')).toBe('recovered');
     expect(runtime).toHaveBeenCalledTimes(2);
   });
+  it('preserves serialized initialization errors from the WebLLM worker', async () => {
+    runtime.mockReturnValueOnce({
+      engine: Promise.reject('QuotaExceededError: Model cache is full'),
+      dispose,
+    });
+    await expect(TestBed.inject(LocalAiProvider).chat('hello')).rejects.toThrow(
+      'QuotaExceededError: Model cache is full',
+    );
+    expect(dispose).toHaveBeenCalledOnce();
+  });
+  it.each(['GPU device lost', { message: 'GPU device lost' }])(
+    'preserves generation error details: %j',
+    async (error) => {
+      create.mockRejectedValueOnce(error);
+      await expect(TestBed.inject(LocalAiProvider).chat('hello')).rejects.toThrow(
+        'GPU device lost',
+      );
+      expect(dispose).toHaveBeenCalledOnce();
+    },
+  );
+  it('uses the fallback only when an error has no message', async () => {
+    create.mockRejectedValueOnce(null);
+    await expect(TestBed.inject(LocalAiProvider).chat('hello')).rejects.toThrow(
+      'Local AI failed to load or generate',
+    );
+  });
   it('prevents simultaneous generation across chat instances', async () => {
     let finish!: (value: unknown) => void;
     create.mockImplementation(
