@@ -3,7 +3,10 @@
   "version": 1,
   "cli": {
     "packageManager": "npm",
-    "analytics": "e2a3dfb6-be60-4590-ae93-3bd9a6304418"
+    "analytics": "e2a3dfb6-be60-4590-ae93-3bd9a6304418",
+    "cache": {
+      "enabled": false
+    }
   },
   "newProjectRoot": "projects",
   "projects": {
@@ -29,13 +32,7 @@
               "src/styles.css"
             ],
             "server": "src/main.server.ts",
-            "outputMode": "server",
-            "security": {
-              "allowedHosts": []
-            },
-            "ssr": {
-              "entry": "src/server.ts"
-            }
+            "outputMode": "static"
           },
           "configurations": {
             "production": {
@@ -51,12 +48,14 @@
                   "maximumError": "8kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "serviceWorker": "ngsw-config.json"
             },
             "development": {
               "optimization": false,
               "extractLicenses": false,
-              "sourceMap": true
+              "sourceMap": true,
+              "serviceWorker": false
             }
           },
           "defaultConfiguration": "production"

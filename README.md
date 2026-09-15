@@ -20,8 +20,7 @@ the dropdown while awaiting a response.
 
 OpenAI and Gemini return local mock responses. The OpenAI model selector is kept
 as frontend demo state; no external AI calls are made and no API key is required.
-Backend integration will live in a separate repository. The standard Angular SSR
-entry point is retained for rendering the frontend.
+Backend integration will live in a separate repository. The frontend is prerendered at build time, hydrates in the browser, and has production-only PWA support.
 
 To add a provider, extend `AiProviderId` and `AI_PROVIDER_OPTIONS`, implement
 `AiProvider` in an auto-provided service, and add its dynamic import to the typed
@@ -88,3 +87,40 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+## Prerendering and PWA
+
+`npm start` runs without a service worker, so Network tools show the actual
+lazy loading of providers. `npm run build` prerenders the initial page into HTML
+and creates the static application in `dist/ng-switzerland/browser`. Angular
+hydrates that HTML in the browser, with event replay enabled.
+
+`outputMode: "static"` and `RenderMode.Prerender` keep server rendering at build
+time. `main.server.ts` and the server config are build entry points, not a
+running backend. No Express server or deployed Node.js process is required.
+
+`npm run preview:pwa` runs the production configuration with the service worker.
+Use a separate port/origin from the development demo to avoid old workers, e.g.
+`npm run preview:pwa -- --port 4300`. PWA installation requires HTTPS (Vercel) or
+localhost. Install from your browser's install menu; on iOS use Share → Add to
+Home Screen. Browser support and install UI vary.
+
+After the first online visit finishes installing the worker and caching the app,
+the UI and both mock providers work offline. The worker caches both the
+prerendered `index.html` and Angular’s `index.csr.html` navigation fallback. Production precaches all JS chunks,
+including providers; the development build still demonstrates on-demand loading.
+Conversation messages remain in memory and reset after a reload. PWA support does
+not add persistence or enable future remote AI calls to run offline.
+
+New versions download in the background and are used on a subsequent reload.
+Close and reopen the app if an older version is still active. The Vercel config
+sets static output, SPA navigation fallback, and revalidation for worker metadata.
+
+Offline verification: build, serve the output on localhost, open it and wait for
+service-worker activation, reload once, then stop the static server and reload.
+Confirm that the page and both mock providers still work. Use a fresh origin or
+clear site data when testing a first install.
+
+Angular CLI persistent caching is disabled in this project because its native
+cache crashed during production builds in the local macOS environment. Revisit
+this workaround after updating the affected build tooling.
