@@ -29,9 +29,9 @@ describe('AiChatStore', () => {
     const request = store.send();
     expect(store.pending()).toBe(true);
     await store.send();
-    expect(chat).toHaveBeenCalledExactlyOnceWith('hello', 'gpt-4.1-mini');
+    expect(chat).toHaveBeenCalledExactlyOnceWith('hello', 'gpt-4.1-mini', expect.any(Function));
     store.prompt.set('new draft');
-    store.provider.set('gemini');
+    store.provider.set('local');
     resolve('answer');
     await request;
     expect(store.messages()).toEqual([

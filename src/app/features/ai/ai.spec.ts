@@ -1,3 +1,5 @@
+import { LocalAiProvider } from './local-ai-provider';
+import { AI_API_URL } from './ai-chat-api';
 import { Injector, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { describe, it, expect, vi } from 'vitest';
@@ -9,6 +11,17 @@ import { OpenAiProvider } from './open-ai-provider';
 import type { AiProvider } from './ai-provider';
 
 describe('Ai', () => {
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        { provide: AI_API_URL, useValue: null },
+        {
+          provide: LocalAiProvider,
+          useValue: { chat: async (prompt: string) => `local: ${prompt}` },
+        },
+      ],
+    });
+  });
   it('switches providers and reuses the loaded service', async () => {
     TestBed.configureTestingModule({
       providers: [
@@ -24,8 +37,8 @@ describe('Ai', () => {
     const loader = TestBed.inject(AI_PROVIDER_LOADER);
     const openai = await loader()();
     expect(await ai.chat('first')).toBe('openai: first');
-    selection.set('gemini');
-    expect(await ai.chat('second')).toBe('gemini: second');
+    selection.set('local');
+    expect(await ai.chat('second')).toBe('local: second');
     selection.set('openai');
     expect(await loader()()).toBe(openai);
   });
@@ -43,8 +56,8 @@ describe('Ai', () => {
     const first = Injector.create({ providers: provideAi(), parent });
     const second = Injector.create({ providers: provideAi(), parent });
     try {
-      first.get(AI_PROVIDER_SELECTION).set('gemini');
-      expect(await first.get(Ai).chat('one')).toBe('gemini: one');
+      first.get(AI_PROVIDER_SELECTION).set('local');
+      expect(await first.get(Ai).chat('one')).toBe('local: one');
       expect(await second.get(Ai).chat('two')).toBe('openai: two');
     } finally {
       first.destroy();

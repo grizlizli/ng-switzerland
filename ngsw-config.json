@@ -11,9 +11,19 @@
           "/index.csr.html",
           "/favicon.ico",
           "/manifest.webmanifest",
+          "/main*.js",
           "/*.css",
-          "/*.js",
           "/icons/**"
+        ]
+      }
+    },
+    {
+      "name": "javascript",
+      "installMode": "lazy",
+      "updateMode": "lazy",
+      "resources": {
+        "files": [
+          "/**/*.js"
         ]
       }
     }

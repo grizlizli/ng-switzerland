@@ -1,6 +1,6 @@
 import { computed, DestroyRef, inject, Injectable, signal } from '@angular/core';
 import { Ai } from '../ai/ai';
-import { AI_PROVIDER_OPTIONS, OPENAI_MODELS } from '../ai/ai-provider';
+import { AI_PROVIDER_OPTIONS, OPENAI_MODELS, LOCAL_MODEL } from '../ai/ai-provider';
 import { AI_PROVIDER_SELECTION } from '../ai/ai-provider-selection';
 
 import { MAX_PROMPT_LENGTH, type ChatMessage } from './chat-message';
@@ -14,6 +14,8 @@ export class AiChatStore {
   readonly model = signal<string>('gpt-4.1-mini');
   readonly #messages = signal<ChatMessage[]>([]);
   readonly #pending = signal(false);
+  readonly #progress = signal<string | null>(null);
+  readonly progress = this.#progress.asReadonly();
   readonly #error = signal<string | null>(null);
   #nextMessageId = 0;
 
@@ -36,12 +38,15 @@ export class AiChatStore {
     const draft = this.prompt();
     const prompt = draft.trim();
     const provider = this.provider();
-    const model = provider === 'openai' ? this.model() : undefined;
+    const model = provider === 'openai' ? this.model() : LOCAL_MODEL;
     this.#pending.set(true);
     this.#error.set(null);
+    this.#progress.set(null);
 
     try {
-      const response = await this.#ai.chat(prompt, model);
+      const response = await this.#ai.chat(prompt, model, (status) => {
+        if (!this.#destroyRef.destroyed) this.#progress.set(status);
+      });
       if (this.#destroyRef.destroyed) return;
       this.#messages.update((messages) => [
         ...messages,
@@ -56,7 +61,10 @@ export class AiChatStore {
         );
       }
     } finally {
-      if (!this.#destroyRef.destroyed) this.#pending.set(false);
+      if (!this.#destroyRef.destroyed) {
+        this.#pending.set(false);
+        this.#progress.set(null);
+      }
     }
   }
 }

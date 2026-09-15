@@ -1,8 +1,21 @@
+import { LocalAiProvider } from '../ai/local-ai-provider';
+import { AI_API_URL } from '../ai/ai-chat-api';
 import { TestBed } from '@angular/core/testing';
 import { AiChat } from './ai-chat';
 import { AiChatStore } from './ai-chat-store';
 
 describe('AiChat', () => {
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        { provide: AI_API_URL, useValue: null },
+        {
+          provide: LocalAiProvider,
+          useValue: { chat: async (prompt: string) => `local: ${prompt}` },
+        },
+      ],
+    });
+  });
   it('binds component forms to store data in both directions', async () => {
     const fixture = TestBed.createComponent(AiChat);
     await fixture.whenStable();
@@ -24,10 +37,10 @@ describe('AiChat', () => {
     expect(prompt.validity.valueMissing).toBe(false);
     expect(store.model()).toBe('gpt-5-mini');
 
-    provider.value = 'gemini';
+    provider.value = 'local';
     provider.dispatchEvent(new Event('input', { bubbles: true }));
     await fixture.whenStable();
-    expect(store.provider()).toBe('gemini');
+    expect(store.provider()).toBe('local');
     expect(element.querySelector('#ai-model')).toBeNull();
 
     store.prompt.set('Updated by the store');
@@ -112,10 +125,10 @@ describe('AiChat', () => {
     const second = TestBed.createComponent(AiChat);
     const firstStore = first.debugElement.injector.get(AiChatStore);
     const secondStore = second.debugElement.injector.get(AiChatStore);
-    firstStore.provider.set('gemini');
+    firstStore.provider.set('local');
     firstStore.prompt.set('Independent chat');
     await firstStore.send();
-    expect(firstStore.messages()[0].provider).toBe('gemini');
+    expect(firstStore.messages()[0].provider).toBe('local');
     expect(secondStore.provider()).toBe('openai');
     expect(secondStore.messages()).toEqual([]);
     expect(secondStore.prompt()).toBe('');

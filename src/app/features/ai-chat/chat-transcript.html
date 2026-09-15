@@ -13,7 +13,7 @@
         <div class="response">
           <div class="message-label">
             <span class="provider-dot" aria-hidden="true"></span
-            >{{ message.provider === 'openai' ? 'OPENAI' : 'GEMINI'
+            >{{ message.provider === 'openai' ? 'OPENAI' : 'LOCAL AI'
             }}<span>{{ message.model ?? 'MOCK' }}</span>
           </div>
           <p>{{ message.response }}</p>
@@ -23,7 +23,7 @@
       <div class="empty">
         <span class="swiss large" aria-hidden="true"></span>
         <h2>Big ideas.<br /><span>Start here.</span></h2>
-        <p>Your first prompt starts the conversation.<br />Try OpenAI, then switch to Gemini.</p>
+        <p>Your first prompt starts the conversation.<br />Try OpenAI, then switch to Local AI.</p>
         <span class="empty-arrow" aria-hidden="true">↖</span>
       </div>
     }

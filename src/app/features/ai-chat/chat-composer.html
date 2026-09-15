@@ -1,6 +1,9 @@
 <form class="composer" (submit)="send($event)">
   <div class="section-heading">
-    <span class="eyebrow">01 / YOUR INPUT</span><span class="demo-badge">MOCK DEMO</span>
+    <span class="eyebrow">01 / YOUR INPUT</span
+    ><span class="demo-badge">{{
+      store.isOpenAi() ? (usesApi ? 'CLOUD API' : 'OPENAI MOCK') : 'ON DEVICE'
+    }}</span>
   </div>
   <h2>Make the call.</h2>
   <p class="muted">Pick a provider and give it something to think about.</p>
@@ -37,5 +40,19 @@
   @if (store.error(); as error) {
     <p class="error" role="alert">{{ error }}</p>
   }
-  <p class="disclaimer">Local demo responses only. No external AI requests.</p>
+  @if (store.progress(); as progress) {
+    <p class="disclaimer" role="status">{{ progress }}</p>
+  }
+  <p class="disclaimer">
+    @if (!store.isOpenAi()) {
+      Local AI runs Llama 3.2 1B on your device. First use downloads hundreds of MB and requires
+      WebGPU. Model files may be cached by your browser.
+    } @else {
+      {{
+        usesApi
+          ? 'OpenAI sends your prompt to the API. A connection is required.'
+          : 'OpenAI is in demo mode and returns a mock response.'
+      }}
+    }
+  </p>
 </form>

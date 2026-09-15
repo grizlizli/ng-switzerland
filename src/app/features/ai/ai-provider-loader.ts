@@ -12,8 +12,8 @@ export function createAiProviderLoader(): Signal<AiProviderLoader> {
     openai: injectAsync<AiProvider>(() =>
       import('./open-ai-provider').then((m) => m.OpenAiProvider),
     ),
-    gemini: injectAsync<AiProvider>(() =>
-      import('./gemini-provider').then((m) => m.GeminiProvider),
+    local: injectAsync<AiProvider>(() =>
+      import('./local-ai-provider').then((m) => m.LocalAiProvider),
     ),
   } satisfies Record<AiProviderId, AiProviderLoader>;
 

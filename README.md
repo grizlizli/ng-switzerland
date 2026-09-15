@@ -1,134 +1,63 @@
-# NgSwitzerland
+# NG Switzerland — Lazy AI providers
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.24.
+Angular 22 demo of lazy dependency injection with two materially different implementations:
 
-## Dynamic AI provider demo
+- **OpenAI**: a small HTTP adapter calling the separate NestJS `ng-switzerland-api`.
+- **Local AI**: WebLLM running Llama 3.2 1B (`Llama-3.2-1B-Instruct-q4f16_1-MLC`) in a Web Worker via WebGPU. No API key or backend inference.
 
-The page shell lives in `App`. `features/ai-chat` contains the chat container,
-composer, transcript, message type, and store with their colocated tests and
-styles. `features/ai` contains provider selection and lazy DI loading.
-`ChatTranscript` receives readonly messages and pending state through signal
-inputs; `ChatComposer` owns Signal Forms and uses the feature-scoped store.
+## Run
 
-
-`AiChatStore` owns writable prompt/model/provider data, messages, pending state, and
-recoverable request errors. `ChatComposer` creates Signal Forms and field validation from
-those signals; the store has no dependency on Angular Forms. The store retains
-submission guards so calls from outside the UI also reject invalid prompts.
-`Ai.chat()` selects a loader, awaits the DI service, and forwards the prompt.
-`AI_PROVIDER_LOADER` uses a computed signal to select between `injectAsync` loaders.
-Changing the provider does not load it until the next request.
-
-`AiChat` uses `provideAiChat()` to register `provideAi()` and `AiChatStore` together
-in its component providers.
-This scopes the selection, loader, and facade together. Separate chat instances
-have independent selections; stateless concrete services remain auto-provided.
-A request keeps the provider selected when it started, even if the user changes
-the dropdown while awaiting a response.
-
-OpenAI and Gemini return local mock responses. The OpenAI model selector is kept
-as frontend demo state; no external AI calls are made and no API key is required.
-Backend integration will live in a separate repository. The frontend is prerendered at build time, hydrates in the browser, and has production-only PWA support.
-
-To add a provider, extend `AiProviderId` and `AI_PROVIDER_OPTIONS`, implement
-`AiProvider` in an auto-provided service, and add its dynamic import to the typed
-loader registry. Avoid static imports of concrete providers in application code.
-
-Tests cover provider switching, independent scopes, deferred loading, failures,
-duplicate submission prevention, draft preservation, and request retry. A failed
-dynamic import is cached by the current Angular `injectAsync` implementation;
-a page reload may be needed to recover a failed chunk download. Provider request
-failures can be retried without reloading.
-
-## Development server
-
-To start a local development server, run:
-
-```bash
+```sh
+nvm use 24.19.0
+npm ci
 npm start
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Start the backend on `127.0.0.1:3000` for real OpenAI calls. Development forwards `/api/**` via `proxy.conf.json`. Only the backend holds `OPENAI_API_KEY`. Restart the dev server after changing Angular/worker/proxy configuration.
 
-## Code scaffolding
+The production build keeps OpenAI in **mock mode** until a hosted API URL is configured in `src/environments/environment.ts`. Local AI is real in both configurations.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Local AI
 
-```bash
-ng generate component component-name
-```
+Use a WebGPU-capable browser with sufficient GPU memory on HTTPS or localhost. The first Local AI submission downloads the runtime, WebAssembly and model weights (hundreds of MB); initialization progress is shown in the composer. No download or GPU initialization occurs just by selecting the provider.
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+WebLLM manages its model cache independently of Angular's service worker. Later initialization may reuse that cache, but offline operation depends on all required resources remaining cached; browser storage eviction can require another download. Prepare the model on the presentation device before a talk.
 
-```bash
-ng generate --help
-```
+A single root-scoped local runtime is reused. Concurrent generation from different chat instances is rejected while it is busy. Failed initialization/generation clears the runtime for retry. The worker is terminated on service destruction. A five-minute timeout bounds initialization and generation. Requests use a 4096-token context window and at most 512 generated tokens. Each prompt is independent; UI history is not sent as model context. Very long prompts may exceed the local token window even within the UI's character limit.
 
-## Building
+## Architecture
 
-To build the project run:
+`App` owns the page shell. `features/ai-chat` contains the container, composer, transcript and store. Signal Forms stay in the composer; request guards and chat state stay in `AiChatStore`. `ChatTranscript` accepts signal inputs.
 
-```bash
-ng build
-```
+`provideAiChat()` composes `provideAi()` and the feature store. Selection and the AI facade are scoped to a chat instance; stateless OpenAI and the managed Local AI runtime are root-scoped. `computed` selects an `injectAsync` loader; `Ai.chat()` captures that loader before awaiting it. Changing selection during a request does not change its provider. New drafts are preserved when previous requests finish.
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+`LocalAiProvider` loads the WebLLM package only on demand. The worker imports its own runtime. JavaScript loading and model initialization are separate phases; progress callbacks describe initialization without coupling providers to UI signals.
 
-## Running unit tests
+## Talk / lazy-loading verification
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+1. Open Network tools in a fresh browser session and clear the log.
+2. Send an OpenAI prompt: no local engine or model should be downloaded.
+3. Select Local AI: still no engine initialization.
+4. Submit a prompt: the lazy provider, WebLLM runtime/worker and model assets load.
+5. Submit again: the initialized engine is reused.
 
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+The production PWA prefetches the main application bundle for offline startup. Other JavaScript assets use lazy cache installation, so selecting a cloud provider does not prefetch WebLLM. Those chunks become offline-capable only after first use. Do not statically import LocalAiProvider into app components.
 
 ## Prerendering and PWA
 
-`npm start` runs without a service worker, so Network tools show the actual
-lazy loading of providers. `npm run build` prerenders the initial page into HTML
-and creates the static application in `dist/ng-switzerland/browser`. Angular
-hydrates that HTML in the browser, with event replay enabled.
+`npm run build` prerenders the home page with hydration/event replay. Deploy `dist/ng-switzerland/browser` as static files; no Express/SSR server runs in this frontend. `main.server.ts` is only a build entry point. WebGPU is accessed only on a Local AI request, never during prerendering.
 
-`outputMode: "static"` and `RenderMode.Prerender` keep server rendering at build
-time. `main.server.ts` and the server config are build entry points, not a
-running backend. No Express server or deployed Node.js process is required.
+`npm run preview:pwa -- --port 4300` runs the production configuration. The manifest supports installation; the service worker caches both prerendered `index.html` and `index.csr.html`. Conversation history remains in memory and resets on reload. Real OpenAI calls require a connection. New PWA versions activate on a subsequent reload.
 
-`npm run preview:pwa` runs the production configuration with the service worker.
-Use a separate port/origin from the development demo to avoid old workers, e.g.
-`npm run preview:pwa -- --port 4300`. PWA installation requires HTTPS (Vercel) or
-localhost. Install from your browser's install menu; on iOS use Share → Add to
-Home Screen. Browser support and install UI vary.
+Angular CLI persistent caching is disabled due to a native cache crash observed in this macOS environment.
 
-After the first online visit finishes installing the worker and caching the app,
-the UI and both mock providers work offline. The worker caches both the
-prerendered `index.html` and Angular’s `index.csr.html` navigation fallback. Production precaches all JS chunks,
-including providers; the development build still demonstrates on-demand loading.
-Conversation messages remain in memory and reset after a reload. PWA support does
-not add persistence or enable future remote AI calls to run offline.
+## Verification
 
-New versions download in the background and are used on a subsequent reload.
-Close and reopen the app if an older version is still active. The Vercel config
-sets static output, SPA navigation fallback, and revalidation for worker metadata.
+```sh
+npm test -- --watch=false
+npm run build
+```
 
-Offline verification: build, serve the output on localhost, open it and wait for
-service-worker activation, reload once, then stop the static server and reload.
-Confirm that the page and both mock providers still work. Use a fresh origin or
-clear site data when testing a first install.
+Tests exercise provider selection, independent chat scopes, form submission, HTTP errors and the local runtime lifecycle using test doubles. They do not download weights or prove GPU inference on every browser. Local runtime tests cover lazy initialization, reuse, retry, concurrency and unsupported browsers.
 
-Angular CLI persistent caching is disabled in this project because its native
-cache crashed during production builds in the local macOS environment. Revisit
-this workaround after updating the affected build tooling.
+References: [WebLLM](https://webllm.mlc.ai/docs/), [Angular style guide](https://angular.dev/style-guide).

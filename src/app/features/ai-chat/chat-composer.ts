@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { form, FormField, maxLength, required, submit, validate } from '@angular/forms/signals';
+import { AI_API_URL } from '../ai/ai-chat-api';
 import { AiChatStore } from './ai-chat-store';
 import { MAX_PROMPT_LENGTH } from './chat-message';
 
@@ -11,6 +12,7 @@ import { MAX_PROMPT_LENGTH } from './chat-message';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChatComposer {
+  protected readonly usesApi = !!inject(AI_API_URL);
   protected readonly store = inject(AiChatStore);
   protected readonly maxPromptLength = MAX_PROMPT_LENGTH;
   protected readonly providerField = form(this.store.provider);

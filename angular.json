@@ -32,7 +32,8 @@
               "src/styles.css"
             ],
             "server": "src/main.server.ts",
-            "outputMode": "static"
+            "outputMode": "static",
+            "webWorkerTsConfig": "tsconfig.worker.json"
           },
           "configurations": {
             "production": {
@@ -55,7 +56,13 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true,
-              "serviceWorker": false
+              "serviceWorker": false,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.development.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -67,7 +74,8 @@
               "buildTarget": "ng-switzerland:build:production"
             },
             "development": {
-              "buildTarget": "ng-switzerland:build:development"
+              "buildTarget": "ng-switzerland:build:development",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"

@@ -2,7 +2,7 @@
   "id": "/",
   "name": "NG Switzerland \u2014 AI Playground",
   "short_name": "NG AI",
-  "description": "Switch AI providers in an Angular playground. Local demo responses, available offline.",
+  "description": "An Angular AI playground with OpenAI and on-device Local AI powered by WebLLM.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
