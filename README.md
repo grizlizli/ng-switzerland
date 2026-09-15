@@ -4,7 +4,10 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 ## Dynamic AI provider demo
 
-`AppStore` owns the prompt, messages, pending state, and recoverable request errors.
+`AppStore` owns writable prompt/model/provider data, messages, pending state, and
+recoverable request errors. `App` creates Signal Forms and field validation from
+those signals; the store has no dependency on Angular Forms. The store retains
+submission guards so calls from outside the UI also reject invalid prompts.
 `Ai.chat()` selects a loader, awaits the DI service, and forwards the prompt.
 `AI_PROVIDER_LOADER` uses a computed signal to select between `injectAsync` loaders.
 Changing the provider does not load it until the next request.
@@ -15,9 +18,10 @@ have independent selections; stateless concrete services remain auto-provided.
 A request keeps the provider selected when it started, even if the user changes
 the dropdown while awaiting a response.
 
-The providers currently return mock responses. Provider identifiers are not model
-identifiers; selecting multiple models per provider can be added to the request
-contract when real integrations are introduced.
+OpenAI and Gemini return local mock responses. The OpenAI model selector is kept
+as frontend demo state; no external AI calls are made and no API key is required.
+Backend integration will live in a separate repository. The standard Angular SSR
+entry point is retained for rendering the frontend.
 
 To add a provider, extend `AiProviderId` and `AI_PROVIDER_OPTIONS`, implement
 `AiProvider` in an auto-provided service, and add its dynamic import to the typed
@@ -34,7 +38,7 @@ failures can be retried without reloading.
 To start a local development server, run:
 
 ```bash
-ng serve
+npm start
 ```
 
 Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.

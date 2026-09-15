@@ -1,16 +1,14 @@
 import { TestBed } from '@angular/core/testing';
-
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { OpenAiProvider } from './open-ai-provider';
 
 describe('OpenAiProvider', () => {
-  let service: OpenAiProvider;
+  afterEach(() => vi.unstubAllGlobals());
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(OpenAiProvider);
-  });
-
-  it('should be created', () => {
-    expect(service).toBeTruthy();
+  it('returns a local mock response without making network requests', async () => {
+    const fetchSpy = vi.fn();
+    vi.stubGlobal('fetch', fetchSpy);
+    expect(await TestBed.inject(OpenAiProvider).chat('Hello')).toBe('openai: Hello');
+    expect(fetchSpy).not.toHaveBeenCalled();
   });
 });

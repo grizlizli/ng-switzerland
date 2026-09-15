@@ -5,11 +5,20 @@ import { Ai } from './ai';
 import { AI_PROVIDER_LOADER } from './ai-provider-loader';
 import { AI_PROVIDER_SELECTION } from './ai-provider-selection';
 import { provideAi } from './provide-ai';
+import { OpenAiProvider } from './open-ai-provider';
 import type { AiProvider } from './ai-provider';
 
 describe('Ai', () => {
   it('switches providers and reuses the loaded service', async () => {
-    TestBed.configureTestingModule({ providers: [provideAi()] });
+    TestBed.configureTestingModule({
+      providers: [
+        provideAi(),
+        {
+          provide: OpenAiProvider,
+          useValue: { chat: async (prompt: string) => `openai: ${prompt}` },
+        },
+      ],
+    });
     const ai = TestBed.inject(Ai);
     const selection = TestBed.inject(AI_PROVIDER_SELECTION);
     const loader = TestBed.inject(AI_PROVIDER_LOADER);
@@ -22,6 +31,14 @@ describe('Ai', () => {
   });
 
   it('keeps selections independent between chat injectors', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        {
+          provide: OpenAiProvider,
+          useValue: { chat: async (prompt: string) => `openai: ${prompt}` },
+        },
+      ],
+    });
     const parent = TestBed.inject(Injector);
     const first = Injector.create({ providers: provideAi(), parent });
     const second = Injector.create({ providers: provideAi(), parent });

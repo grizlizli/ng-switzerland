@@ -15,7 +15,7 @@ describe('AppStore', () => {
 
   it('rejects empty prompts and duplicate submissions while preserving a new draft', async () => {
     const store = TestBed.inject(AppStore);
-    store.promptField().value.set('  ');
+    store.prompt.set('  ');
     await store.send();
     expect(chat).not.toHaveBeenCalled();
     let resolve!: (response: string) => void;
@@ -25,34 +25,34 @@ describe('AppStore', () => {
           resolve = done;
         }),
     );
-    store.promptField().value.set(' hello ');
+    store.prompt.set(' hello ');
     const request = store.send();
     expect(store.pending()).toBe(true);
     await store.send();
-    expect(chat).toHaveBeenCalledExactlyOnceWith('hello');
-    store.promptField().value.set('new draft');
-    store.providerField().value.set('gemini');
+    expect(chat).toHaveBeenCalledExactlyOnceWith('hello', 'gpt-4.1-mini');
+    store.prompt.set('new draft');
+    store.provider.set('gemini');
     resolve('answer');
     await request;
     expect(store.messages()).toEqual([
-      { id: 0, provider: 'openai', prompt: 'hello', response: 'answer' },
+      { id: 0, provider: 'openai', model: 'gpt-4.1-mini', prompt: 'hello', response: 'answer' },
     ]);
-    expect(store.promptField().value()).toBe('new draft');
+    expect(store.prompt()).toBe('new draft');
     expect(store.pending()).toBe(false);
   });
 
   it('retains failed prompts and allows a successful retry', async () => {
     const store = TestBed.inject(AppStore);
-    store.promptField().value.set('hello');
+    store.prompt.set('hello');
     chat.mockRejectedValueOnce(new Error('offline')).mockResolvedValueOnce('answer');
     await store.send();
     expect(store.error()).toBeTruthy();
     expect(store.pending()).toBe(false);
-    expect(store.promptField().value()).toBe('hello');
+    expect(store.prompt()).toBe('hello');
     expect(store.messages()).toEqual([]);
     await store.send();
     expect(store.error()).toBeNull();
     expect(store.messages()).toHaveLength(1);
-    expect(store.promptField().value()).toBe('');
+    expect(store.prompt()).toBe('');
   });
 });

@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { FormField } from '@angular/forms/signals';
+import { form, FormField, maxLength } from '@angular/forms/signals';
 import { AppStore } from './app-store';
 import { provideAi } from './features/ai/provide-ai';
 
@@ -12,4 +12,7 @@ import { provideAi } from './features/ai/provide-ai';
 })
 export class App {
   protected readonly store = inject(AppStore);
+  protected readonly providerField = form(this.store.provider);
+  protected readonly modelField = form(this.store.model);
+  protected readonly promptField = form(this.store.prompt, (path) => maxLength(path, 8000));
 }
