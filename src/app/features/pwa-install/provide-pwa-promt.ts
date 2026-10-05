@@ -1,6 +1,6 @@
 import type { Provider } from '@angular/core';
-import { PwaPrompt } from './pwa-prompt';
+import { PWAPrompt  } from './pwa-prompt';
 
-export function providePwaPromt(): Provider[] {
-  return [PwaPrompt];
+export function providePwaPrompt(): Provider[] {
+  return [PWAPrompt];
 }

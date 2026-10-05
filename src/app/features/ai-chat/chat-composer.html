@@ -41,7 +41,22 @@
     <p class="error" role="alert">{{ error }}</p>
   }
   @if (store.progress(); as progress) {
-    <p class="disclaimer" role="status">{{ progress }}</p>
+    <div class="model-progress" role="status" [attr.aria-label]="progress">
+      <div class="model-progress-header">
+        <span class="model-progress-label">{{ progress }}</span>
+        @if (store.downloadProgress(); as pct) {
+          <span class="model-progress-pct">{{ pct }}%</span>
+        }
+      </div>
+      @if (store.downloadProgress() !== null) {
+        <div class="model-progress-track" aria-hidden="true">
+          <div
+            class="model-progress-fill"
+            [style.width.%]="store.downloadProgress()"
+          ></div>
+        </div>
+      }
+    </div>
   }
   <p class="disclaimer">
     @if (!store.isOpenAi()) {

@@ -1,4 +1,5 @@
 import { computed, DestroyRef, inject, Injectable, signal } from '@angular/core';
+
 import { Ai } from '../ai/ai';
 import { AI_PROVIDER_OPTIONS, OPENAI_MODELS, LOCAL_MODEL } from '../ai/ai-provider';
 import { AI_PROVIDER_SELECTION } from '../ai/ai-provider-selection';
@@ -16,6 +17,13 @@ export class AiChatStore {
   readonly #pending = signal(false);
   readonly #progress = signal<string | null>(null);
   readonly progress = this.#progress.asReadonly();
+  /** Parsed download percentage (0–100) when the local model is being fetched, null otherwise. */
+  readonly downloadProgress = computed<number | null>(() => {
+    const p = this.#progress();
+    if (!p) return null;
+    const match = p.match(/Preparing local model:\s*(\d+)%/);
+    return match ? parseInt(match[1], 10) : null;
+  });
   readonly #error = signal<string | null>(null);
   #nextMessageId = 0;
 

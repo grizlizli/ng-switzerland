@@ -106,6 +106,41 @@ textarea {
   color: var(--muted);
   margin: 16px 0 0;
 }
+.model-progress {
+  margin: 16px 0 0;
+}
+.model-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+.model-progress-label {
+  font-family: monospace;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+}
+.model-progress-pct {
+  font-family: monospace;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  color: var(--ink);
+  font-weight: bold;
+  flex-shrink: 0;
+}
+.model-progress-track {
+  height: 16px;
+  background: #e6e6e6;
+  overflow: hidden;
+}
+.model-progress-fill {
+  height: 100%;
+  background: var(--gradient, linear-gradient(90deg, #9600dc, #e0007a));
+  transition: width 0.3s ease;
+  min-width: 2px;
+}
 .error {
   color: #b00026;
   font-size: 14px;

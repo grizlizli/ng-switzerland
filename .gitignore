@@ -11,6 +11,18 @@
 npm-debug.log
 yarn-error.log
 
+# AI coding assistants
+.agents/
+.claude/
+.hermes/
+.junie/
+.kiro/
+.pi/
+.qoder/
+.qwen/
+.trae/
+.windsurf/
+
 # IDEs and editors
 .idea/
 .project
@@ -48,3 +60,4 @@ Thumbs.db
 .env.*
 !.env.example
 .vercel
+
