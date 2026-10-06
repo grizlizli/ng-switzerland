@@ -1,4 +1,12 @@
-import { afterNextRender, Injectable, computed, DestroyRef, inject, signal } from '@angular/core';
+import {
+  afterNextRender,
+  Injectable,
+  computed,
+  DestroyRef,
+  inject,
+  signal,
+  Service,
+} from '@angular/core';
 
 interface InstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -7,8 +15,8 @@ interface InstallPromptEvent extends Event {
 
 const DISMISSED_KEY = 'ng-ai-install-dismissed';
 
-@Injectable()
-export class PwaPrompt {
+@Service({ autoProvided: false })
+export class PWAPrompt {
   readonly #destroyRef = inject(DestroyRef);
   readonly #prompt = signal<InstallPromptEvent | null>(null);
   readonly #installed = signal(false);
